@@ -16,7 +16,7 @@ Also outputs a dictionary with descriptive stats (right now, only outputs the ti
 '''
 
 
-def mouse_farm(df_path, maze_array):
+def mouse_farm(df_path, maze_array, dist_threshold=35):
 
     mouse_df = pd.read_csv(df_path, header=2, sep='\t')
     file_path = pd.read_csv(df_path).iloc[0, 0]
@@ -71,10 +71,10 @@ def mouse_farm(df_path, maze_array):
         keys in des_df: ['file_path', 'center_time', 'top_time', 'left_time', 'right_time']
         
         '''
-
+        print(mouse_df)
         time_spent = y_maze_time_spent(mouse_df)
 
-        mouse_df = time_spent[1]
+        mouse_df = pd.concat([mouse_df, time_spent[1]], axis=1)
 
         des_df = {'file_path': file_path}
         des_df.update(time_spent[0])
@@ -85,7 +85,9 @@ def mouse_farm(df_path, maze_array):
         '''
         # TODO: need path of master dataframe of descriptive stats (2nd dataframe, in case we want to append that data as well.)
 
-        mouse_df = mouse_edge_distance(mouse_df, coords)
+        dist_df = mouse_edge_distance(mouse_df, coords, dist_threshold)
+
+        mouse_df = pd.concat([mouse_df, dist_df], axis=1)
 
         return mouse_df, des_df
 
@@ -109,8 +111,8 @@ output: Will make a new csv file or append it to an existing one. Also checks fo
 '''
 
 
-def sheet_appender(mouse_dfpath, maze_array, master_path, sep=',', copy=False):
-    mouse_df = mouse_farm(mouse_dfpath, maze_array)[0]
+def sheet_appender(mouse_dfpath, maze_array, master_path, sep=',', dist_threshold=.9, copy=False):
+    mouse_df = mouse_farm(mouse_dfpath, maze_array, dist_threshold)[0]
     if not os.path.isfile(master_path):
         mouse_df.to_csv(master_path, mode='a', index=False, sep=sep)
     else:
@@ -130,5 +132,13 @@ def sheet_appender(mouse_dfpath, maze_array, master_path, sep=',', copy=False):
                 mouse_df.to_csv(master_path, mode='a', index=False, sep=sep, header=False)
 
 
-sheet_appender(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', 'square', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test4.csv')
+
+
+
+def main():
+    sheet_appender(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', 'ymaze', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test4.csv')
+
+
+if __name__ == "__main__":
+    main()
 
