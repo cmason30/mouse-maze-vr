@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from shapely.geometry import Point
 from shapely.geometry import Polygon, LineString, LinearRing
@@ -78,11 +77,13 @@ def y_maze_time_spent(behavioral_df):
     for key, value in regions_dict.items():
 
         ymaze_mouse[key] = ymaze_mouse.apply(lambda row: value.contains(Point(row["Position.X"], row["Position.Y"])),axis=1)
-
         time_spent_region[key] = ymaze_mouse[ymaze_mouse[key] == True]['time_diff'].sum()
 
     # Applies the region_match function to each row and gives a string label for where the coordinate was found
     ymaze_mouse['region'] = ymaze_mouse.apply(region_match, axis=1)
+    first_time = ymaze_mouse['#Snapshot Timestamp'][0]
+    first_region = ymaze_mouse['region'][0]
+    time_spent_region[first_region] += first_time
 
     # New output df with the labelled columns
 
@@ -104,18 +105,21 @@ def y_maze_time_spent(behavioral_df):
 
 
 def main():
-    df_test_ymaze = pd.read_csv(r'/Users/colinmason/Downloads/8007_OF_Habituation.behavior', header=2, sep='\t')
-    coords = np.array([[-433.013, -452.582],
-                       [0, -202.582],
-                       [433.013, -452.582],
-                       [558.013, -236.075],
-                       [125, 13.925],
-                       [125, 513.924],
-                       [-125, 513.924],
-                       [-125, 13.925],
-                       [-558.013, -236.075]])
+    df_test_ymaze = pd.read_csv(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', header=2, sep='\t')
+    # coords = np.array([[-433.013, -452.582],
+    #                    [0, -202.582],
+    #                    [433.013, -452.582],
+    #                    [558.013, -236.075],
+    #                    [125, 13.925],
+    #                    [125, 513.924],
+    #                    [-125, 513.924],
+    #                    [-125, 13.925],
+    #                    [-558.013, -236.075]])
+    #
+    print(sum(y_maze_time_spent(df_test_ymaze)[0].values()))
+    # print(df_test_ymaze['#Snapshot Timestamp'][0] + y_maze_time_spent(df_test_ymaze)[1]['time_diff'].sum())
+    # time = 180.017000
 
-    print(mouse_edge_distance(df_test_ymaze, coords))
 
 
 if __name__ == "__main__":
