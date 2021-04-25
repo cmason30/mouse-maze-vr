@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from shapely.geometry import Point
 from shapely.geometry import Polygon, LineString, LinearRing
@@ -99,6 +100,40 @@ def y_maze_time_spent(behavioral_df):
     return time_spent_region, out_df[['time_diff', 'region']]
 
 
+def shapes(maze_array):
+    if (maze_array.lower() == 'square') or (maze_array.lower() == 'of'):
+        coords = np.array([[750, -750],
+                           [-750, -750],
+                           [-750, 750],
+                           [750, 750]])
+
+    elif maze_array.lower() == 'circle':
+        coords = 750  # <- radius
+
+    elif maze_array.lower() == 'ymaze':
+        coords = np.array([[-433.013, -452.582],
+                           [0, -202.582],
+                           [433.013, -452.582],
+                           [558.013, -236.075],
+                           [125, 13.925],
+                           [125, 513.924],
+                           [-125, 513.924],
+                           [-125, 13.925],
+                           [-558.013, -236.075]])
+
+    elif maze_array.lower() == 'corridor':
+        coords = np.array([[-75, -1332.286],
+                           [-75, 1332.286],
+                           [75, 1332.286],
+                           [75, -1332.286]])
+
+    else:
+        return print('Give a valid shape type.')
+
+    return coords
+
+
+
 
 
 
@@ -116,11 +151,9 @@ def main():
     #                    [-125, 13.925],
     #                    [-558.013, -236.075]])
     #
-    print(sum(y_maze_time_spent(df_test_ymaze)[0].values()))
+    print(y_maze_time_spent(df_test_ymaze)[0])
     # print(df_test_ymaze['#Snapshot Timestamp'][0] + y_maze_time_spent(df_test_ymaze)[1]['time_diff'].sum())
     # time = 180.017000
-
-
 
 if __name__ == "__main__":
     main()

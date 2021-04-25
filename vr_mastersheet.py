@@ -16,13 +16,13 @@ Also outputs a dictionary with descriptive stats (right now, only outputs the ti
 '''
 
 
-def mouse_farm(df_path, maze_array, dist_threshold=35):
+def mouse_farm(df_path, maze_array, dist_threshold=.9):
 
     mouse_df = pd.read_csv(df_path, header=2, sep='\t')
     file_path = pd.read_csv(df_path).iloc[0, 0]
     mouse_df['filepath'] = file_path
     mouse_df['maze_type'] = maze_array
-    print(mouse_df.columns)
+    coords = shapes(maze_array)
 
     '''
     Columns of dataframe up to this point:
@@ -30,35 +30,6 @@ def mouse_farm(df_path, maze_array, dist_threshold=35):
        'Position.Y', 'Position.Z', 'Forward.X', 'Forward.Y', 'Forward.Z',
        'filepath', 'maze_type']
     '''
-
-    if (maze_array.lower() == 'square') or (maze_array.lower() == 'of'):
-        coords = np.array([[750, -750],
-                           [-750, -750],
-                           [-750, 750],
-                           [750, 750]])
-
-    elif maze_array.lower() == 'circle':
-        coords = 750
-
-    elif maze_array.lower() == 'ymaze':
-        coords = np.array([[-433.013, -452.582],
-                           [0, -202.582],
-                           [433.013, -452.582],
-                           [558.013, -236.075],
-                           [125, 13.925],
-                           [125, 513.924],
-                           [-125, 513.924],
-                           [-125, 13.925],
-                           [-558.013, -236.075]])
-
-    elif maze_array.lower() == 'corridor':
-        coords = np.array([[-75, -1332.286],
-                           [-75, 1332.286],
-                           [75, 1332.286],
-                           [75, -1332.286]])
-
-    else:
-        return print('Give a valid shape type.')
 
     if maze_array == 'ymaze':
         '''
@@ -71,7 +42,6 @@ def mouse_farm(df_path, maze_array, dist_threshold=35):
         keys in des_df: ['file_path', 'center_time', 'top_time', 'left_time', 'right_time']
         
         '''
-        print(mouse_df)
         time_spent = y_maze_time_spent(mouse_df)
 
         mouse_df = pd.concat([mouse_df, time_spent[1]], axis=1)
