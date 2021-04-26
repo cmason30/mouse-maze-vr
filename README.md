@@ -10,3 +10,6 @@ colin_funcs.py
 
 vr_mastersheet.py 
 - References colin_funcs.py and has everything needed to create an experiment dataframe and send it to a master_csv. 
+
+vr_vis.py
+- Plots mouse movements and other statistics with a variety of visualizations. 
