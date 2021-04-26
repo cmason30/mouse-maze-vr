@@ -1,12 +1,10 @@
-from vr_mastersheet import mouse_farm
-from colin_funcs import shapes, y_maze_time_spent
+from mastersheet_mod_funcs import mouse_farm
+from colin_funcs import shapes
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, LineString
 from shapely.ops import linemerge, unary_union, polygonize
 import numpy as np
 import seaborn as sns
-
-x1 = mouse_farm(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', 'ymaze')
 
 
 def mouse_path(mouse_df, maze_array):
@@ -32,6 +30,7 @@ def time_regon_plot_ymaze(ymaze_dict):
 
 
 def main():
+    x1 = mouse_farm(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', 'ymaze')
     return np.nan
 
 

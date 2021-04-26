@@ -122,6 +122,76 @@ def shapes(maze_array):
     return coords
 
 
+# ---------------------------------------- Master sheet generator ------------------------------------------------ #
+
+
+'''
+
+Organizes the functions to create a dataframe with all the significant variables as columns. 
+
+Input
+df_path: Give the file path of the behavioral file of interest.
+maze_array: Give one of four strings( 'square', 'circle', 'ymaze', 'corridor') based on the maze that the behavior file ran on
+master_path: Give the file path of the master sheet so that the new data being generated in this function appends to it. If generating
+a new master sheet, then just leave as None
+
+Output
+Outputs a dataframe with the comprehensive data from the statistical functions above.
+Also outputs a dictionary with descriptive stats (right now, only outputs the time in each region for ymaze.) 
+'''
+
+
+def mouse_farm(df_path, maze_array, dist_threshold=.9):
+    mouse_df = pd.read_csv(df_path, header=2, sep='\t')
+    file_path = pd.read_csv(df_path).iloc[0, 0]
+    mouse_df['filepath'] = file_path
+    mouse_df['maze_type'] = maze_array
+    coords = shapes(maze_array)
+
+    '''
+    Columns of dataframe up to this point:
+    ['#Snapshot Timestamp', 'Trigger Region Identifier', 'Position.X',
+       'Position.Y', 'Position.Z', 'Forward.X', 'Forward.Y', 'Forward.Z',
+       'filepath', 'maze_type']
+    '''
+
+    if maze_array == 'ymaze':
+        '''
+        Appends the ymaze region information to the dataframe.
+        New Columns appended: ['time_diff', 'region']
+        time_diff = Difference between timestamp of n row and n-1 row
+        gets row region that the coordinates were found in. (Returns as string of 'top', 'center', 'left', 'right')
+
+        Also creates des_df which is the one row dataframe information.
+        keys in des_df: ['file_path', 'center_time', 'top_time', 'left_time', 'right_time']
+
+        '''
+        time_spent = y_maze_time_spent(mouse_df)
+
+        mouse_df = pd.concat([mouse_df, time_spent[1]], axis=1)
+
+        des_df = {'file_path': file_path}
+        des_df.update(time_spent[0])
+
+        '''
+        # Next, finish off with mouse edge distance function which adds two more columns:
+        # Columns: ['mouse_dist', 'distance_marked']
+        '''
+        # TODO: need path of master dataframe of descriptive stats (2nd dataframe, in case we want to append that data as well.)
+
+        dist_df = mouse_edge_distance(mouse_df, coords, dist_threshold)
+
+        mouse_df = pd.concat([mouse_df, dist_df], axis=1)
+
+        return mouse_df, des_df
+
+    else:
+        mouse_df['time_diff'] = mouse_df['#Snapshot Timestamp'].diff()
+        mouse_df['region'] = np.nan
+        empty_dict = 'nothing here'
+        mouse_df = mouse_edge_distance(mouse_df, coords)
+        return mouse_df, empty_dict
+
 
 
 
