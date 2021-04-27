@@ -1,0 +1,167 @@
+# YRegions
+# Input: dataframe
+# Output: df["Regions"], and regions dictionary
+def YRegions (df):
+  df = df.copy()
+
+  # Checks Base
+  def inBase (cx, cy):
+    ax = -125
+    ay = 13.925
+    bx = 125
+    by = 13.925
+    rval = ((bx-ax)*(cy-ay) - (by-ay)*(cx-ax))
+    if rval > 0:
+      return True
+    return False
+
+  # Checks Right
+  def inRight (cx, cy):
+    ax = 0
+    ay = -202.582
+    bx = 125
+    by = 13.925
+    rval = ((bx-ax)*(cy-ay) - (by-ay)*(cx-ax))
+    if rval < 0:
+      return True
+    return False
+
+  # Checks Left
+  def inLeft (cx, cy):
+    ax = 0
+    ay = -202.582
+    bx = -125
+    by = 13.925
+    rval = ((bx-ax)*(cy-ay) - (by-ay)*(cx-ax))
+    if rval > 0:
+      return True
+    return False
+
+  # Checks Center
+  def inCenter (cx, cy):
+    # Check if not in other regions
+    if not inBase(cx,cy) and not inLeft(cx,cy) and not inRight(cx, cy):
+      # Check base, left, and right boundaries
+      if (cy < 13.925) and (((-125 - 0)*(cy - -202.582) - (13.925 - -202.582)*(cx - 0)) < 0) and (((125 - 0)*(cy - -202.582) - (13.925 - -202.582)*(cx - 0)) > 0):
+          return True
+    return False
+
+  # Create column of time difference
+  df["Time_diff"] = df["#Snapshot Timestamp"].diff()
+
+  # Dictionary that holds time per region
+  dictRegionTime = {
+      "Base": 0,
+      "Right": 0,
+      "Left": 0,
+      "Center": 0,
+  }
+
+  regions = []
+  for row_name, row in df.iterrows():
+    x = row["Position.X"]
+    y = row["Position.Y"]
+    if inBase(x,y):
+      regions.append("Base")
+      if math.isnan(row["Time_diff"]):
+        dictRegionTime["Base"] += row["#Snapshot Timestamp"]
+      else:
+        dictRegionTime["Base"] += row["Time_diff"]
+    elif inRight(x,y):
+      regions.append("Right")
+      if math.isnan(row["Time_diff"]):
+        dictRegionTime["Right"] += row["#Snapshot Timestamp"]
+      else:
+        dictRegionTime["Right"] += row["Time_diff"]
+    elif inLeft(x,y):
+      regions.append("Left")
+      if math.isnan(row["Time_diff"]):
+        dictRegionTime["Left"] += row["#Snapshot Timestamp"]
+      else:
+        dictRegionTime["Left"] += row["Time_diff"]
+    elif inCenter(x,y):
+      regions.append("Center")
+      if math.isnan(row["Time_diff"]):
+        dictRegionTime["Center"] += row["#Snapshot Timestamp"]
+      else:
+        dictRegionTime["Center"] += row["Time_diff"]
+    else:
+      regions.append("None")
+
+  df["Region"] = regions
+
+  return df["Region"], dictRegionTime
+  
+  
+#===================================================================================
+# calcSpeed
+# Input: Dataframe
+# Output: df["Speed"], and mean of df["Speed"]
+def calcSpeed (df):
+  #df=df.copy()
+
+  df["X_diff"] = df["Position.X"].diff()
+  df["Y_diff"] = df["Position.Y"].diff()
+  df["Time_diff"] = df["#Snapshot Timestamp"].diff()
+
+  # List of speeds
+  speeds = [0.0,]
+
+  dfTemp = df.iloc[1:,:]
+  for row_name, row in dfTemp.iterrows():
+    a = row["X_diff"]
+    b = row["Y_diff"]
+    t = row["Time_diff"]
+    
+    # Find c
+    c = math.pow(a, 2) + math.pow(b, 2)
+    c = math.sqrt(c)
+
+    # Find speed and append to list
+    speed = c / t
+    speeds.append(speed)
+
+  # Add column to dataframe
+  df["Speed"] = speeds
+
+  return df["Speed"], np.mean(df["Speed"])
+  
+  
+#================================================================================
+# AverageVelocity
+# Input: Dataframe
+# Output: Float Value of average velocity throughout entire simulation (cm/sec)
+def avgVelocity (dataf):
+  df = dataf.copy()
+  
+  # Find Total Path Length
+  totalPathLength = 0
+
+  df["X_diff"] = df["Position.X"].diff()
+  df["Y_diff"] = df["Position.Y"].diff()
+
+  dfsliced = df.iloc[1:,:]
+
+  for row_name, row in dfsliced.iterrows():
+    # a equals difference in x values
+    a = row["X_diff"]
+    aSquared = math.pow(a, 2)
+
+    # b equals difference in y values
+    b = row["Y_diff"]
+    bSquared = math.pow(b, 2)
+
+    # Calculate length traveled in interval, and add to pathLength
+    tempLength = math.sqrt(aSquared + bSquared)
+    totalPathLength += tempLength 
+
+  # Find Total Time
+  totalTime_sec = df.iloc[(df.index.size - 1), 0]
+
+  # Find Average Velocity
+  avgVel = totalPathLength / totalTime_sec
+
+  return avgVel
+  
+  
+#==============================================================================
