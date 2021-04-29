@@ -18,6 +18,9 @@ mastersheet_mod_funcs.py
 vr_vis.py
 - Plots mouse movements and other statistics with a variety of visualizations. 
 
+run_experiments.py
+- Can loop through experiment files, given a directory. 
+
 ----------------------------
 
 The file tree:
