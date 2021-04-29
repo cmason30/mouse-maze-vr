@@ -9,9 +9,10 @@ colin_sub_funcs.py
 - Functions for colin_funcs to reference. 
 
 colin_funcs.py
-- This file contains the necessary functions for vr_mastersheet.py to reference. 
+- This file contains the necessary functions for vr_mastersheet.py to reference.
+- Also compiles everything into a mastersheet.  
 
-vr_mastersheet.py 
+mastersheet_mod_funcs.py 
 - References colin_funcs.py and has everything needed to create an experiment dataframe and send it to a master_csv. 
 
 vr_vis.py
@@ -21,4 +22,4 @@ vr_vis.py
 
 The file tree:
 
-colin_sub_funcs.py > colin_funcs.py > vr_mastersheet.py > vr_vis.py
+colin_sub_funcs.py > colin_funcs.py > mastersheet_mod_funcs.py > vr_vis.py
