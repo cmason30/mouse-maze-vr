@@ -19,7 +19,7 @@ Dataframe of two columns:
     distance_marked - marks coordinates with 1 if mouse is within distance threshold that was set
 '''
 
-def mouse_edge_distance(behavioral_df, maze_coordinates, distance_threshold=.1):
+def mouse_edge_distance(behavioral_df, maze_coordinates, distance_threshold):
     df_test = behavioral_df.copy()
 
     # Gets inner shape to make distance threshold boundary polygons
@@ -27,14 +27,14 @@ def mouse_edge_distance(behavioral_df, maze_coordinates, distance_threshold=.1):
 
     # Checks coordinates in each row and returns the mouses distance from the edge and True or False if mouse is
     # within the threshold distance to the wall
-    df_test["mouse_dist"] = df_test.apply(lambda row: polygon_maze.exterior.distance(Point(row["Position.X"], row["Position.Y"])), axis=1)
+    df_test["mouse_from_wall_units"] = df_test.apply(lambda row: polygon_maze.exterior.distance(Point(row["Position.X"], row["Position.Y"])), axis=1)
     df_test['distance_marked'] = df_test.apply(lambda row: 1 if reduced_poly.contains(Point(row["Position.X"], row["Position.Y"])) else 0, axis=1)
-
+    df_test['mouse_from_wall_%_input'] = distance_threshold
     # Checks that all coordinates are in Polygon
     colin_sub_funcs.within_bounds(df_test, polygon_maze)
 
     # outputs two columns: mouse_dist, distance_marked
-    return df_test[['mouse_dist', 'distance_marked']]
+    return df_test[["mouse_from_wall_units", 'distance_marked', 'mouse_from_wall_%_input']]
 
 
 
@@ -141,10 +141,11 @@ Also outputs a dictionary with descriptive stats (right now, only outputs the ti
 '''
 
 
-def mouse_farm(df_path, maze_array, dist_threshold=.9):
+def mouse_farm(df_path, maze_array, dist_threshold=.1):
     mouse_df = pd.read_csv(df_path, header=2, sep='\t')
-    file_path = pd.read_csv(df_path).iloc[0, 0]
-    mouse_df['filepath'] = file_path
+    # file_path = pd.read_csv(df_path).iloc[0, 0]
+    file_name = os.path.basename(df_path)
+    mouse_df['filepath'] = file_name
     mouse_df['maze_type'] = maze_array
     coords = shapes(maze_array)
 
@@ -170,36 +171,32 @@ def mouse_farm(df_path, maze_array, dist_threshold=.9):
 
         mouse_df = pd.concat([mouse_df, time_spent[1]], axis=1)
 
-        des_df = {'file_path': file_path}
+        des_df = {'filepath': file_name}
         des_df.update(time_spent[0])
 
         '''
         # Next, finish off with mouse edge distance function which adds two more columns:
         # Columns: ['mouse_dist', 'distance_marked']
         '''
-        # TODO: need path of master dataframe of descriptive stats (2nd dataframe, in case we want to append that data as well.)
-
         dist_df = mouse_edge_distance(mouse_df, coords, dist_threshold)
 
         mouse_df = pd.concat([mouse_df, dist_df], axis=1)
 
-        return mouse_df, des_df
+        return mouse_df, pd.DataFrame([des_df])
 
     else:
         mouse_df['time_diff'] = mouse_df['#Snapshot Timestamp'].diff()
         mouse_df['region'] = np.nan
         empty_dict = 'nothing here'
-        mouse_df = mouse_edge_distance(mouse_df, coords)
+        dist_df = mouse_edge_distance(mouse_df, coords, dist_threshold)
+
+        mouse_df = pd.concat([mouse_df, dist_df], axis=1)
         return mouse_df, empty_dict
 
 
 
-
-
-
-
 def main():
-    df_test_ymaze = pd.read_csv(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', header=2, sep='\t')
+    # df_test_ymaze = pd.read_csv(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', header=2, sep='\t')
     # coords = np.array([[-433.013, -452.582],
     #                    [0, -202.582],
     #                    [433.013, -452.582],
@@ -210,9 +207,10 @@ def main():
     #                    [-125, 13.925],
     #                    [-558.013, -236.075]])
     #
-    print(y_maze_time_spent(df_test_ymaze)[0])
+    # print(y_maze_time_spent(df_test_ymaze)[0])
     # print(df_test_ymaze['#Snapshot Timestamp'][0] + y_maze_time_spent(df_test_ymaze)[1]['time_diff'].sum())
     # time = 180.017000
+    print(mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__2.behavior', 'ymaze')[1])
 
 if __name__ == "__main__":
     main()

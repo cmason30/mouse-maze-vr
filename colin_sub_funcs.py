@@ -14,15 +14,16 @@ reduced_poly: Inner threshold polygon to detect mouse near wall
 '''
 
 def shape_shrink(maze_coordinates, distance_threshold):
+    distance_val = 1 - distance_threshold
     if isinstance(maze_coordinates, int):
         p = Point(0, 0)
-        inner_circle = maze_coordinates * (1 - distance_threshold)
+        inner_circle = maze_coordinates * distance_val
         polygon_maze = p.buffer(maze_coordinates)
         reduced_poly = polygon_maze.difference(Point(0.0, 0.0).buffer(inner_circle))  # <- donut
 
     else:
         ident_mat = np.zeros((2, 2), float)
-        np.fill_diagonal(ident_mat, (1 - distance_threshold))
+        np.fill_diagonal(ident_mat, distance_val)
         coords_t = maze_coordinates.transpose()
         coords_red = np.matmul(ident_mat, coords_t)
         polygon_maze = Polygon(maze_coordinates)

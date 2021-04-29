@@ -12,8 +12,7 @@ output: Will make a new csv file or append it to an existing one. Also checks fo
 '''
 
 
-def sheet_appender(mouse_dfpath, maze_array, master_path, sep=',', dist_threshold=.9, copy=False):
-    mouse_df = mouse_farm(mouse_dfpath, maze_array, dist_threshold)[0]
+def sheet1_appender(mouse_df, master_path, sep=',', copy=False):
     if not os.path.isfile(master_path):
         mouse_df.to_csv(master_path, mode='a', index=False, sep=sep)
     else:
@@ -35,10 +34,12 @@ def sheet_appender(mouse_dfpath, maze_array, master_path, sep=',', dist_threshol
 
 
 
-
 def main():
-    sheet_appender(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', 'ymaze', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test4.csv')
+    # sheet1_appender(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', 'ymaze', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test4.csv')
 
+    org_string = 'hey there.csv'
+    mod_string = org_string[:len(org_string) - 4]
+    print(mod_string + '_sheet2'+ '.csv')
 
 if __name__ == "__main__":
     main()
