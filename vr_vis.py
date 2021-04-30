@@ -9,7 +9,6 @@ import seaborn as sns
 
 def mouse_path(mouse_df, maze_array, save_path=None):
     maze = Polygon(shapes(maze_array))
-    sns.scatterplot(x='Position.X', y='Position.Y', marker='o', data=mouse_df, s=5)
     fig = plt.figure()
     if maze_array == 'ymaze':
         line = [LineString([(0, -202.582), (-125, 13.925), (125, 13.925), (0, -202.582)]), maze.boundary]
@@ -19,7 +18,7 @@ def mouse_path(mouse_df, maze_array, save_path=None):
         for polygon in polygons:
             x, y = polygon.exterior.xy
             plt.plot(x, y)
-
+    sns.lineplot(x='Position.X', y='Position.Y', data=mouse_df, linewidth=.3)
     plt.show()
     if save_path is not None:
         fig.savefig(save_path)
@@ -35,9 +34,9 @@ def time_regon_plot_ymaze(ymaze_dict):
 
 
 def main():
-    x1 = mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1/8003_CPP_cocaine_white _maze.behavior', 'corridor')
+    x1 = mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__1.behavior', 'ymaze')
 
-    mouse_path(x1[0], 'corridor', save_path='/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/saved_figure-50pi.png')
+    mouse_path(x1[0], 'ymaze', save_path='/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/saved_figure-52pi.png')
 
 if __name__ == "__main__":
     main()
