@@ -159,11 +159,11 @@ Also outputs a second dataframe with descriptive stats gives region times and sp
 def mouse_farm(df_path, maze_array, dist_threshold=.1):
     mouse_df = pd.read_csv(df_path, header=2, sep='\t')
     # file_path = pd.read_csv(df_path).iloc[0, 0]
-    file_name = os.path.basename(df_path)
+    file_name = df_path
 
     coords = shapes(maze_array)
 
-    mouse_df['filepath'] = file_name
+    mouse_df['filepath'] = df_path
     mouse_df['maze_type'] = maze_array
 
     mouse_distance = mouse_edge_distance(mouse_df, coords, dist_threshold)

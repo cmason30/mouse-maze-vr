@@ -24,7 +24,7 @@ def sheet1_appender(mouse_df, master_path, sep=',', copy=False):
             master = pd.read_csv(master_path)
             if not copy:
                 if mouse_df['filepath'].unique()[0] in master['filepath'].unique():
-                    raise Exception('Warning! Filepath already found in master sheet csv. Set copy=True to append anyway.')
+                    return print(f'Warning! Filepath[{mouse_df["filepath"].unique()[0]}] is already found in master sheet csv. Set copy=True to append anyway.')
                 else:
                     mouse_df.to_csv(master_path, mode='a', index=False, sep=sep, header=False)
 
