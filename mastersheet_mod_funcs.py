@@ -35,11 +35,8 @@ def sheet1_appender(mouse_df, master_path, sep=',', copy=False):
 
 
 def main():
-    # sheet1_appender(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior', 'ymaze', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test4.csv')
+    sheet1_appender(mouse_farm(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior','ymaze')[0], r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test8.csv')
 
-    org_string = 'hey there.csv'
-    mod_string = org_string[:len(org_string) - 4]
-    print(mod_string + '_sheet2'+ '.csv')
 
 if __name__ == "__main__":
     main()

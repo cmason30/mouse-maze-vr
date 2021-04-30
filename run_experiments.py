@@ -46,14 +46,14 @@ def experiment_output(directory, master_path1, maze_array, dist_threshold=.1):
 
 def main():
 
-    directory = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day'
-    master_file = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test7.csv'
+    directory = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 4'
+    master_file = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v1.csv'
     # file_path = r'/Users/colinmason/Desktop/yorglab/CPP Experiment Data/Day 1/8002_CPP_cocaine_blue_maze.behavior'
     # test_df = pd.read_csv(r'/Users/colinmason/Desktop/yorglab/CPP Experiment Data/Day 1/8002_CPP_cocaine_blue_maze.behavior', header=2, sep='\t')
     # file_line = pd.read_csv(file_path).iloc[0, 0]
     # print(file_line)
 
-    experiment_output(directory,master_file, 'ymaze')
+    experiment_output(directory,master_file, 'corridor')
 
 
 if __name__ == '__main__':
@@ -61,4 +61,4 @@ if __name__ == '__main__':
 
 
 # TODO: Incorporate database function for uploading mastersheet?
-# TODO: Automate the process of reading the maze type in the behavioral files so that they will not need to be input manually.
+# TODO: Automate the process of reading the maze type in the behavioral files so that they will not need to be input manuall

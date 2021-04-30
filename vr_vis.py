@@ -35,7 +35,7 @@ def time_regon_plot_ymaze(ymaze_dict):
 
 
 def main():
-    x1 = mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/ymaze.behavior', 'ymaze')
+    x1 = mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1/8003_CPP_cocaine_white _maze.behavior', 'corridor')
 
     mouse_path(x1[0], 'corridor', save_path='/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/saved_figure-50pi.png')
 

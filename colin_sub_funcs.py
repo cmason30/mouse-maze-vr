@@ -55,7 +55,7 @@ def region_match(row):
     elif row['left']:
         return 'left'
     else:
-        raise Exception('Warning! Mouse movement detected outside of Polygon boundaries.')
+        raise Exception('Warning! Mouse coordinates found outside of all ymaze regions.')
 
 
 

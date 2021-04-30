@@ -1,3 +1,6 @@
+import math
+import numpy as np
+
 #===============================================================================
 # YRegions
 # Input: dataframe
@@ -99,33 +102,33 @@ def YRegions (df):
 # Input: Dataframe
 # Output: df["Speed"], and mean of df["Speed"]
 def calcSpeed (df):
-  #df=df.copy()
+    df=df.copy()
 
-  df["X_diff"] = df["Position.X"].diff()
-  df["Y_diff"] = df["Position.Y"].diff()
-  df["Time_diff"] = df["#Snapshot Timestamp"].diff()
+    df["X_diff"] = df["Position.X"].diff()
+    df["Y_diff"] = df["Position.Y"].diff()
+    df["Time_diff"] = df["#Snapshot Timestamp"].diff()
 
   # List of speeds
-  speeds = [0.0,]
+    speeds = [0.0,]
 
-  dfTemp = df.iloc[1:,:]
-  for row_name, row in dfTemp.iterrows():
-    a = row["X_diff"]
-    b = row["Y_diff"]
-    t = row["Time_diff"]
+    dfTemp = df.iloc[1:,:]
+    for row_name, row in dfTemp.iterrows():
+        a = row["X_diff"]
+        b = row["Y_diff"]
+        t = row["Time_diff"]
     
     # Find c
-    c = math.pow(a, 2) + math.pow(b, 2)
-    c = math.sqrt(c)
+        c = math.pow(a, 2) + math.pow(b, 2)
+        c = math.sqrt(c)
 
     # Find speed and append to list
-    speed = c / t
-    speeds.append(speed)
+        speed = c / t
+        speeds.append(speed)
 
   # Add column to dataframe
-  df["Speed"] = speeds
+    df["Speed"] = speeds
 
-  return df["Speed"], np.mean(df["Speed"])
+    return df["Speed"], np.mean(df["Speed"])
   
   
 #================================================================================
