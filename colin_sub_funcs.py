@@ -6,6 +6,9 @@ import numpy as np
 
 '''
 Creates polygon of maze and inner maze for boundary separation. 
+Input 
+maze_coordinates: Polygon of maze 
+
 
 Output 
 polygon_maze: Polygon of entire maze boundaries
@@ -13,22 +16,22 @@ reduced_poly: Inner threshold polygon to detect mouse near wall
 
 '''
 
-def shape_shrink(maze_coordinates, distance_threshold):
+def shape_shrink(maze_polygon, distance_threshold):
     distance_val = 1 - distance_threshold
-    if isinstance(maze_coordinates, int):
+    if isinstance(maze_polygon, int):
         p = Point(0, 0)
-        inner_circle = maze_coordinates * distance_val
-        polygon_maze = p.buffer(maze_coordinates)
+        inner_circle = maze_polygon * distance_val
+        polygon_maze = p.buffer(maze_polygon)
         reduced_poly = polygon_maze.difference(Point(0.0, 0.0).buffer(inner_circle))  # <- donut
 
     else:
         ident_mat = np.zeros((2, 2), float)
         np.fill_diagonal(ident_mat, distance_val)
-        coords_t = maze_coordinates.transpose()
+        coords_t = maze_polygon.transpose()
         coords_red = np.matmul(ident_mat, coords_t)
-        polygon_maze = Polygon(maze_coordinates)
+        polygon_maze = Polygon(maze_polygon)
         red_lin = LinearRing(coords_red.transpose())
-        reduced_poly = Polygon(maze_coordinates, [red_lin])
+        reduced_poly = Polygon(maze_polygon, [red_lin])
 
     return polygon_maze, reduced_poly
 
@@ -70,3 +73,40 @@ def regions_dictionary():
     right = Polygon(LineString([(125, 13.925), (558.013, -236.075), (433.013, -452.582), (0, -202.582), (125, 13.925)]))
 
     return {'top': top, 'center': center, 'left': left, 'right': right}
+
+
+'''
+Organizes maze coordinates for function use. 
+'''
+
+def shapes(maze_array):
+    if (maze_array.lower() == 'square') or (maze_array.lower() == 'of'):
+        coords = np.array([[750, -750],
+                           [-750, -750],
+                           [-750, 750],
+                           [750, 750]])
+
+    elif maze_array.lower() == 'circle':
+        coords = 750  # <- radius
+
+    elif maze_array.lower() == 'ymaze':
+        coords = np.array([[-433.013, -452.582],
+                           [0, -202.582],
+                           [433.013, -452.582],
+                           [558.013, -236.075],
+                           [125, 13.925],
+                           [125, 513.924],
+                           [-125, 513.924],
+                           [-125, 13.925],
+                           [-558.013, -236.075]])
+
+    elif maze_array.lower() == 'corridor':
+        coords = np.array([[-75, -1332.286],
+                           [-75, 1332.286],
+                           [75, 1332.286],
+                           [75, -1332.286]])
+
+    else:
+        return print('Give a valid shape type.')
+
+    return coords

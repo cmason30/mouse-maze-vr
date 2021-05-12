@@ -31,12 +31,12 @@ def time_regon_plot_ymaze(ymaze_dict):
     plt.show()
 
 
-
+# TODO: Update time_region_plot_ymaze to read dataframe instead of dictionary.
 
 def main():
-    x1 = mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__1.behavior', 'ymaze')
+    x1 = mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1/8003_CPP_cocaine_white _maze.behavior', 'corridor')
 
-    mouse_path(x1[0], 'ymaze', save_path='/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/saved_figure-52pi.png')
+    mouse_path(x1[0], 'corridor')
 
 if __name__ == "__main__":
     main()

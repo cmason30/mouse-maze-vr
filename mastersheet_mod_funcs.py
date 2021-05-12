@@ -1,7 +1,50 @@
-from colin_funcs import *
+import colin_funcs
+import noah_funcs
+import pandas as pd
+import os
+
+# ---------------------------------------- Master sheet generator ------------------------------------------------ #
+
 
 '''
-Helper function for mouse_farm().
+
+Organizes the functions to create a dataframe with all the significant variables as columns. 
+
+Input
+df_path: Give the file path of the behavioral file of interest.
+maze_array: Give one of four strings( 'square', 'circle', 'ymaze', 'corridor') based on the maze that the behavior file ran on
+master_path: Give the file path of the master sheet so that the new data being generated in this function appends to it. If generating
+a new master sheet, then just leave as None
+
+Output
+Outputs a dataframe with the comprehensive data from the statistical functions above.
+Also outputs a second dataframe with descriptive stats gives region times and speed/velocity 
+'''
+
+
+def mouse_farm(df_path, maze_array, dist_threshold=.1):
+    mouse_df = pd.read_csv(df_path, header=2, sep='\t')
+    # file_path = pd.read_csv(df_path).iloc[0, 0]
+    file_name = df_path
+
+    mouse_df['filepath'] = df_path
+    mouse_df['maze_type'] = maze_array
+
+    mouse_distance = colin_funcs.mouse_edge_distance(mouse_df, maze_array, dist_threshold)
+    mouse_df['speed'] = noah_funcs.calcSpeed(mouse_df)
+
+    time_spent = colin_funcs.y_maze_time_spent(mouse_df, file_name, maze_array)
+
+    final_df = pd.concat([mouse_df, mouse_distance, time_spent[1]], axis=1)
+    des_dict = pd.concat([time_spent[0], noah_funcs.avgVelocity(mouse_df)], axis=1)
+
+    return final_df, des_dict
+
+
+
+'''
+Helper function for mouse_farm(). Sends data to CSV. 
+
 Also checks that files are not duplicated in the master sheet. 
 
 mouse_dfpath: insert mouse_df here.
@@ -35,8 +78,9 @@ def sheet1_appender(mouse_df, master_path, sep=',', copy=False):
 
 
 def main():
-    sheet1_appender(mouse_farm(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior','ymaze')[0], r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test8.csv')
-
+    sheet1 = mouse_farm(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior','ymaze')
+    # sheet1_appender(sheet1[0], r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test8.csv')
+    print(sheet1[1].columns)
 
 if __name__ == "__main__":
     main()
