@@ -1,5 +1,4 @@
-import helper_functions1
-import helper_functions2
+from helper_functions import helper_functions1, helper_functions2
 import pandas as pd
 import os
 
