@@ -1,9 +1,8 @@
-from mastersheet_mod_funcs import mouse_farm
-from colin_funcs import shapes
+from main import mouse_farm
+from colin_sub_funcs import shapes
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, LineString
 from shapely.ops import linemerge, unary_union, polygonize
-import numpy as np
 import seaborn as sns
 
 

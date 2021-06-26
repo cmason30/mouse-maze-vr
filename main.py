@@ -1,5 +1,5 @@
-import colin_funcs
-import noah_funcs
+import helper_functions1
+import helper_functions2
 import pandas as pd
 import os
 
@@ -30,13 +30,13 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
     mouse_df['filepath'] = df_path
     mouse_df['maze_type'] = maze_array
 
-    mouse_distance = colin_funcs.mouse_edge_distance(mouse_df, maze_array, dist_threshold)
-    mouse_df['speed'] = noah_funcs.calcSpeed(mouse_df)
+    mouse_distance = helper_functions1.mouse_edge_distance(mouse_df, maze_array, dist_threshold)
+    mouse_df['speed'] = helper_functions2.calc_speed(mouse_df)
 
-    time_spent = colin_funcs.y_maze_time_spent(mouse_df, file_name, maze_array)
+    time_spent = helper_functions1.y_maze_time_spent(mouse_df, file_name, maze_array)
 
     final_df = pd.concat([mouse_df, mouse_distance, time_spent[1]], axis=1)
-    des_dict = pd.concat([time_spent[0], noah_funcs.avgVelocity(mouse_df)], axis=1)
+    des_dict = pd.concat([time_spent[0], helper_functions2.avg_velocity(mouse_df)], axis=1)
 
     return final_df, des_dict
 
@@ -75,12 +75,41 @@ def sheet1_appender(mouse_df, master_path, sep=',', copy=False):
                 mouse_df.to_csv(master_path, mode='a', index=False, sep=sep, header=False)
 
 
+# ---------Final Output Functions --------------- #
+
+
+
+'''
+Loops through all experiment files in a given directory and returns them as an organized CSV. 
+
+Input
+    directory: Given folder of behavioral files to read in.
+    master_path1: Desired mastersheet to input files to. Or input a new file name at end of file_path string and it will create a new masterhseet
+    maze_array: Give maze type
+    dist_threshold: For distance from wall function
+
+Output
+    1. Appends to or makes a new master sheet csv
+    2. Makes another csv of ymaze region time spent values. Or appends to an existing one.
+        This second csv will have the same name as the master sheet, but with *_sheet.csv at the end. 
+'''
+
+
+def experiment_output(directory, master_path1, maze_array, dist_threshold=.1):
+    for behavioral_file in helper_functions1.file_walk(directory):
+        mouse_df = mouse_farm(behavioral_file, maze_array, dist_threshold)
+        sheet1_appender(mouse_df[0], master_path1)
+        desc_sheet2 = master_path1[:len(master_path1) - 4] + '_sheet2' + '.csv'
+        sheet1_appender(mouse_df[1], desc_sheet2)
+        print('File Input')
+
 
 
 def main():
-    sheet1 = mouse_farm(r'/Users/colinmason/Desktop/ymaze_run_2_23_21 (1).behavior','ymaze')
-    # sheet1_appender(sheet1[0], r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test8.csv')
-    print(sheet1[1].columns)
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1',
+                      r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test_file10.csv',
+                      'corridor')
+
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,5 @@
 from vr_vis import mouse_path, time_regon_plot_ymaze
-from mastersheet_mod_funcs import sheet1_appender
-from colin_funcs import mouse_farm
+from main import sheet1_appender, mouse_farm
 import pandas as pd
 import os
 
@@ -61,4 +60,5 @@ if __name__ == '__main__':
 
 
 # TODO: Incorporate database function for uploading mastersheet?
-# TODO: Automate the process of reading the maze type in the behavioral files so that they will not need to be input manuall
+# TODO: Automate the process of reading the maze type in the behavioral files so that they will not need to be input manually
+
