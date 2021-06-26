@@ -105,9 +105,14 @@ def experiment_output(directory, master_path1, maze_array, dist_threshold=.1):
 
 
 def main():
-    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1',
-                      r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test_file10.csv',
-                      'corridor')
+
+    directory = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1'
+    output_master_csv_path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/test_file10.csv'
+    maze_type = 'corridor'
+
+    experiment_output(directory,
+                      output_master_csv_path,
+                      maze_type)
 
 
 if __name__ == "__main__":
