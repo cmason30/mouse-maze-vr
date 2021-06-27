@@ -221,14 +221,23 @@ def y_maze_time_spent(behavioral_df, file_name, maze_type):
     return des_df, ymaze_mouse[['time_diff', 'region']]
 
 
-'''
-Organizes maze coordinates for function use. 
-'''
+"""
+Gets total distance traveled for experiment
+
+"""
+
+def total_distance_traveled(behavioral_df):
+    mouse_df = behavioral_df.copy()
+    dx = (mouse_df['Position.X'] - mouse_df['Position.X'].shift())
+    dy = (mouse_df['Position.Y'] - mouse_df['Position.Y'].shift())
+    mouse_df['euclidean_dist'] = np.sqrt(dx ** 2 + dy ** 2)
+    total_distance = mouse_df['euclidean_dist'].sum()
+    return pd.DataFrame([total_distance], columns=['distance_traveled'])
+
 
 
 def main():
-    print('NaN')
-
+    print('sup')
 
 if __name__ == "__main__":
     main()
