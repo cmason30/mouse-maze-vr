@@ -16,7 +16,7 @@ master_path: Give the file path of the master sheet so that the new data being g
 a new master sheet, then just leave as None
 
 Output
-Outputs a dataframe with the comprehensive data from the statistical functions above.
+Outputs a dataframe with the comprehensive data from the statistical functions in the helper_functions files.
 Also outputs a second dataframe with descriptive stats gives region times and speed/velocity 
 '''
 
@@ -33,11 +33,12 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
     mouse_df['speed'] = helper_functions2.calc_speed(mouse_df)
 
     time_spent = helper_functions1.y_maze_time_spent(mouse_df, file_name, maze_array)
+    total_distance_traveled = helper_functions1.total_distance_traveled(mouse_df[['Position.X', 'Position.Y']])
 
     final_df = pd.concat([mouse_df, mouse_distance, time_spent[1]], axis=1)
-    des_dict = pd.concat([time_spent[0], helper_functions2.avg_velocity(mouse_df)], axis=1)
-
-    return final_df, des_dict
+    des_df_row = pd.concat([time_spent[0], helper_functions2.avg_velocity(mouse_df), total_distance_traveled], axis=1)
+    print(des_df_row)
+    return final_df, des_df_row
 
 
 
@@ -101,7 +102,6 @@ def experiment_output(directory, master_path1, maze_array, dist_threshold=.1):
         desc_sheet2 = master_path1[:len(master_path1) - 4] + '_sheet2' + '.csv'
         sheet1_appender(mouse_df[1], desc_sheet2)
         print('File Input')
-
 
 
 def main():
