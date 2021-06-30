@@ -40,8 +40,8 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
 
     final_df = pd.concat([mouse_df, mouse_distance, time_spent[1]], axis=1)
     des_df_row = pd.concat([time_spent[0], helper_functions2.avg_velocity(mouse_df), total_distance_traveled], axis=1)
-    print(des_df_row)
-    return final_df, des_df_row
+    mesg = 'File Input.'
+    return final_df, des_df_row, mesg
 
 
 
