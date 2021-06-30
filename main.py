@@ -32,13 +32,16 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
     mouse_distance = helper_functions1.mouse_edge_distance(mouse_df, maze_array, dist_threshold)
     mouse_df['speed'] = helper_functions2.calc_speed(mouse_df)
 
+    mouse_df['drug_applied'] = mouse_df.apply(lambda row: helper_functions1.drug_applied(row['filepath']), axis=1)
+    # mouse_df['pairing_info'] = mouse_df.apply(lambda row: helper_functions1.pairing_info(row['filepath']), axis=1)
+
     time_spent = helper_functions1.y_maze_time_spent(mouse_df, file_name, maze_array)
     total_distance_traveled = helper_functions1.total_distance_traveled(mouse_df[['Position.X', 'Position.Y']])
 
     final_df = pd.concat([mouse_df, mouse_distance, time_spent[1]], axis=1)
     des_df_row = pd.concat([time_spent[0], helper_functions2.avg_velocity(mouse_df), total_distance_traveled], axis=1)
-    print(des_df_row)
-    return final_df, des_df_row
+    mesg = 'File Input.'
+    return final_df, des_df_row, mesg
 
 
 

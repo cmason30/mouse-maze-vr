@@ -5,6 +5,34 @@ import numpy as np
 import os
 
 # ------------ First line functions ----------------------- #
+"""
+Creates rug applied column data
+
+"""
+def drug_applied(path):
+    if 'saline' in path:
+        return 'saline'
+    elif 'cocaine' in path:
+        return 'cocaine'
+    else:
+        return None
+
+
+
+"""
+Creates pairing_info column data
+
+
+"""
+
+
+def pairing_info(path):
+    if 'saline' in path:
+        return 'saline'
+    elif 'cocaine' in path:
+        return 'cocaine'
+    else:
+        return None
 
 '''
 Gets all file paths in a given directory 
@@ -234,6 +262,10 @@ def total_distance_traveled(behavioral_df):
     total_distance = mouse_df['euclidean_dist'].sum()
     return pd.DataFrame([total_distance], columns=['distance_traveled'])
 
+"""
+Creates rug applied column
+
+"""
 
 
 def main():
