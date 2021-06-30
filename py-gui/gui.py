@@ -1,6 +1,5 @@
 import PySimpleGUI as sg
-import main
-import os
+from helper_functions import helper_functions1
 
 
 # def func(message):
@@ -33,8 +32,8 @@ def gui():
         if event == "Submit":
             in_path = values["-IN-"]
             out_path = values["-IN2-"]
-            main_df = main.mouse_farm(in_path, 'corridor')
-            main.sheet1_appender(out_path, main_df)
+            main_df = helper_functions1.mouse_farm(in_path, 'corridor')
+            helper_functions1.sheet1_appender(out_path, main_df)
 
         elif event == "Cancel" or event == sg.WIN_CLOSED:
             break

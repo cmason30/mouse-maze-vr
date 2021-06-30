@@ -40,7 +40,7 @@ def shapes(maze_array):
 
 # ------------- Visualization functions --------------------- #
 
-def mouse_path(mouse_df, maze_array, save_path=None):
+def mouse_movement(mouse_df, maze_array, save_path=None):
     maze = Polygon(shapes(maze_array))
     fig = plt.figure()
     if maze_array == 'ymaze':
@@ -57,10 +57,6 @@ def mouse_path(mouse_df, maze_array, save_path=None):
         fig.savefig(save_path)
 
 
-def time_regon_plot_ymaze(ymaze_dict):
-    time = [float(i) for i in ymaze_dict.values()]
-    sns.barplot(x=list(ymaze_dict.keys()), y=time)
-    plt.show()
 
 
 def main():
