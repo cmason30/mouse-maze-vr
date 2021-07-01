@@ -301,6 +301,10 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
 
     final_df = pd.concat([mouse_df, mouse_distance, time_spent[1]], axis=1)
     des_df_row = pd.concat([time_spent[0], helper_functions2.avg_velocity(mouse_df), total_distance_traveled], axis=1)
+
+    des_df_row.insert(5, 'drug_applied', drug_applied(df_path))
+    des_df_row.insert(5, 'maze_type', maze_array)
+
     mesg = 'File Input.'
     return final_df, des_df_row, mesg
 
@@ -368,7 +372,15 @@ def experiment_output(directory, master_path1, maze_array, dist_threshold=.1):
 
 
 def main():
-    print('sup')
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v2.csv', 'corridor')
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 2', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v2.csv', 'corridor')
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 3', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v2.csv', 'corridor')
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 4', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v2.csv', 'corridor')
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 5', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v2.csv', 'corridor')
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 6', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v2.csv', 'corridor')
+    experiment_output(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day', r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/test/vr_master_v2.csv', 'ymaze')
+
+
 
 
 if __name__ == "__main__":
