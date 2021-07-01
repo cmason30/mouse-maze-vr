@@ -37,6 +37,9 @@ def mazeplot_ymaze(mouse_df):
 
 
 
+
+
+
 test1 = helper_functions1.mouse_farm(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__1.behavior', 'ymaze')
 
 print(mazeplot_ymaze(test1[0]))
