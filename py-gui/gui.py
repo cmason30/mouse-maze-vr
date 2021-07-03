@@ -1,9 +1,22 @@
 import PySimpleGUI as sg
-from helper_functions import helper_functions1
-# def func(message):
-#     print(message)
-#
-#
+from helper_functions import file_constructors
+
+
+def output_window():
+    layout = [
+        [sg.T("")],
+        [sg.Text("Set Outputs")],
+        [sg.Text("Choose output Path: "), sg.Input(key='test'), sg.FileBrowse(key="-master-")]
+
+    ]
+    window = sg.Window("Outputs", layout, modal=True)
+    while True:
+        event, values = window.read()
+        if event == "Exit" or event == sg.WIN_CLOSED:
+            break
+
+    window.close()
+
 
 def gui():
     layout = [
@@ -20,10 +33,15 @@ def gui():
               [sg.Button("Submit Batch Job")],
               [sg.T("")],
               [sg.Text('Output')],
-              [sg.Text("Choose output Path:"), sg.Input(), sg.FileBrowse(key="-master-"), sg.VerticalSeparator(), sg.Output(size=(40,10))],
+              [sg.Text("Choose output Path:"), sg.Input('No Path', key='test')],
+              [sg.FileSaveAs('Make New', default_extension='.csv', key="-master-"), sg.FileBrowse('Load Existing', key='-existing-out-')],
+              [sg.Text('')],
+              [sg.HorizontalSeparator()],
+              [sg.Text('Console')],
+              [sg.Output(size=(60,10))],
               [sg.Cancel()]
              ]
-
+    sg.Input()
     window = sg.Window(title="MouseVR v1.0", layout=layout)
 
     # Create event loop
@@ -46,10 +64,9 @@ def gui():
                 shape = 'of'
 
             in_path = values["-IN-"]
-            out_path = values["-master-"]
-            # mouse_df = helper_functions1.mouse_farm(in_path, shape)
-            # helper_functions1.sheet1_appender(out_path, mouse_df)
-            print("Submitted to Output File.")
+            out_path = values["test"]
+            # file_constructors.experiment_output(in_path, out_path, shape, gui=True, window=window)
+            print(out_path)
             window.Refresh()
 
 
@@ -67,11 +84,9 @@ def gui():
             elif values['-of-']:
                 shape = 'of'
 
-            in_path = values['-DIR-IN-']
-            out_path = values["-IN2-"]
-            mouse_df = helper_functions1.mouse_farm(in_path, shape)
-            helper_functions1.sheet1_appender(out_path, mouse_df)
-            sg.Popup("Running Script Execution. Please Wait.")
+            file_constructors.experiment_output(values['-DIR-IN-'], values["-master-"], shape, gui=True, window=window)
+            print('Submitted to Output File.')
+            window.Refresh()
 
         elif event == "Cancel" or event == sg.WIN_CLOSED:
             break
@@ -84,7 +99,6 @@ def gui():
 
 if __name__ == "__main__":
     gui()
-    print(0)
 
 
 
