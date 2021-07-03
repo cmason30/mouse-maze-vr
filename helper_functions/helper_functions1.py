@@ -1,4 +1,5 @@
 import pandas as pd
+import PySimpleGUI as sg
 from shapely.geometry import Point
 from shapely.geometry import Polygon, LineString, LinearRing
 import numpy as np
@@ -362,13 +363,22 @@ Output
 '''
 
 
-def experiment_output(directory, master_path1, maze_array, dist_threshold=.1):
-    for behavioral_file in file_walk(directory):
+def experiment_output(directory, master_path1, maze_array, dist_threshold=.1, gui=False, window=None):
+    count = 0
+    for _ in file_walk(directory):
+        count += 1
+
+    for idx, behavioral_file in enumerate(file_walk(directory)):
         mouse_df = mouse_farm(behavioral_file, maze_array, dist_threshold)
         sheet1_appender(mouse_df[0], master_path1)
         desc_sheet2 = master_path1[:len(master_path1) - 4] + '_sheet2' + '.csv'
         sheet1_appender(mouse_df[1], desc_sheet2)
-        print('File Input')
+        print(f'File Input {idx} of {count}.')
+        if gui:
+            window.Refresh()
+
+
+
 
 
 def main():
