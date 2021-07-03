@@ -41,7 +41,7 @@ def sheet1_appender(mouse_df, master_path, sep=',', copy=False):
             master = pd.read_csv(master_path)
             if not copy:
                 if mouse_df['filepath'].unique()[0] in master['filepath'].unique():
-                    return print(f'Warning! Filepath[{mouse_df["filepath"].unique()[0]}] is already found in master sheet csv. Set copy=True to append anyway.')
+                    print(f'Warning! Filepath[{mouse_df["filepath"].unique()[0]}] is already found in master sheet csv. Set copy=True to append anyway.')
                 else:
                     mouse_df.to_csv(master_path, mode='a', index=False, sep=sep, header=False)
 
@@ -81,7 +81,7 @@ def experiment_output(dir_or_file, master_path1, maze_array, dist_threshold=.1, 
             sheet1_appender(mouse_df[0], master_path1)
             desc_sheet2 = master_path1[:len(master_path1) - 4] + '_sheet2' + '.csv'
             sheet1_appender(mouse_df[1], desc_sheet2)
-            print(f'File Input {idx} of {count}.')
+            print(f'File Input {idx+1} of {count}.')
             if gui:
                 window.Refresh()
 
