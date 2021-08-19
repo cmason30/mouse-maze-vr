@@ -291,12 +291,36 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
     des_df_row.insert(5, 'drug_applied', drug_applied(df_path))
     des_df_row.insert(5, 'maze_type', maze_array)
 
-    mesg = 'File Input.'
-    return final_df, des_df_row, mesg
+    # mesg = 'File Processed.'
+    return final_df, des_df_row
+
+
+
+def generate_analyis(behavioral_filepath, maze_array, dist_threshold=.1, output_path=None):
+    mouse_df = mouse_farm(behavioral_filepath, maze_array, dist_threshold)
+    pathname = os.path.splitext(behavioral_filepath)[0]
+    if output_path is None:
+        mouse_df[0].to_csv(f'{pathname}_processed.csv')
+        mouse_df[1].to_json(f'{pathname}_additional_data.json', orient="index")
+
+    # elif output_path is not None:
+    #     mouse_df[0].to_csv(f'{output_path}_processed.csv')
+    #     mouse_df[1].to_json(f'{output_path}_experiment_data.json', orient="index")
+    #     print('File processed.')
+
+    else:
+        print('Give a valid filepath.')
+
+
+
+
 
 
 def main():
-    return None
+    in_path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1/8002_CPP_cocaine_blue_maze.behavior'
+
+    generate_analyis(in_path,'corridor')
+
 
 
 if __name__ == "__main__":
