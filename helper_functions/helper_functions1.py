@@ -98,11 +98,12 @@ def regions_dictionary():
     return {'top': top, 'center': center, 'left': left, 'right': right}
 
 
+
 '''
 Organizes maze coordinates for function use. 
 '''
 
-def shapes(maze_array):
+def shapes(maze_array, plotly=False):
     if (maze_array.lower() == 'square') or (maze_array.lower() == 'of'):
         coords = np.array([[750, -750],
                            [-750, -750],
@@ -113,15 +114,21 @@ def shapes(maze_array):
         coords = 750  # <- radius
 
     elif maze_array.lower() == 'ymaze':
-        coords = np.array([[-433.013, -452.582],
-                           [0, -202.582],
-                           [433.013, -452.582],
-                           [558.013, -236.075],
-                           [125, 13.925],
-                           [125, 513.924],
-                           [-125, 513.924],
-                           [-125, 13.925],
-                           [-558.013, -236.075]])
+            coords = np.array([[-433.013, -452.582],
+                               [0, -202.582],
+                               [433.013, -452.582],
+                               [558.013, -236.075],
+                               [125, 13.925],
+                               [125, 513.924],
+                               [-125, 513.924],
+                               [-125, 13.925],
+                               [-558.013, -236.075]])
+
+            if plotly:
+                x, y = coords.T
+                x = np.append(x, [-433.013])
+                y = np.append(y, [-452.582])
+                return x, y
 
     elif maze_array.lower() == 'corridor':
         coords = np.array([[-75, -1332.286],
@@ -133,6 +140,8 @@ def shapes(maze_array):
         return print('Give a valid shape type.')
 
     return coords
+
+
 
 
 
@@ -189,6 +198,51 @@ Output
 
 time_spent dictionary, columns of time_diff and region
 '''
+def y_maze_regions(behavioral_df, maze_type):
+    mouse_df = behavioral_df.copy()
+    mouse_df['time_diff'] = mouse_df['#Snapshot Timestamp'].diff()
+
+    def isin_region(row):
+        top = Polygon(LineString([(-125, 513.924), (-125, 13.925), (125, 13.925), (125, 513.924), (-125, 513.924)]))
+        center = Polygon(LineString([(0, -202.582), (-125, 13.925), (125, 13.925), (0, -202.582)]))
+        left = Polygon(
+            LineString([(-125, 13.925), (-558.013, -236.075), (-433.013, -452.582), (0, -202.582), (-125, 13.925)]))
+        right = Polygon(
+            LineString([(125, 13.925), (558.013, -236.075), (433.013, -452.582), (0, -202.582), (125, 13.925)]))
+
+        if top.contains(Point(row["Position.X"], row["Position.Y"])):
+            return 'top'
+
+        elif center.contains(Point(row["Position.X"], row["Position.Y"])):
+            return 'center'
+
+        elif left.contains(Point(row["Position.X"], row["Position.Y"])):
+            return 'left'
+
+        elif right.contains(Point(row["Position.X"], row["Position.Y"])):
+            return 'right'
+
+        else:
+            raise Exception(f'Points on {row["#Snapshot Timestamp"]} not found in any region for ymaze.')
+
+    if maze_type == 'ymaze':
+        region_times = {}
+        mouse_df['regions'] = mouse_df.apply(isin_region, axis=1)
+        regions_grouped = mouse_df.groupby(['regions'])
+        for region, df in regions_grouped:
+            region_times[region] = df['time_diff'].sum()
+
+    else:
+        mouse_df['regions'] = None
+        region_times = {'top': None, 'center': None, 'left': None, 'right': None}
+
+    return mouse_df[['time_diff', 'regions']], region_times
+
+
+
+
+
+
 
 def y_maze_time_spent(behavioral_df, file_name, maze_type):
     ymaze_mouse = behavioral_df.copy()
@@ -233,7 +287,7 @@ def y_maze_time_spent(behavioral_df, file_name, maze_type):
 
     des_df = pd.DataFrame(time_spent_region, columns=['filepath','top_time','center_time','left_time','right_time'], index=[0])
 
-    return des_df, ymaze_mouse[['time_diff', 'region']]
+    return des_df, ymaze_mouse[['time_diff', 'region']], time_spent_region
 
 
 """
@@ -317,9 +371,19 @@ def generate_analyis(behavioral_filepath, maze_array, dist_threshold=.1, output_
 
 
 def main():
-    in_path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Day 1/8002_CPP_cocaine_blue_maze.behavior'
 
-    generate_analyis(in_path,'corridor')
+
+    path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__1.behavior'
+    df = pd.read_csv(path, header=2, sep='\t')
+    test1 = y_maze_time_spent(df, path, maze_type='ymaze')
+    print(test1)
+    # {'center': 1.9873099999999013, 'left': 509.18416, 'right': 8.456999999999994, 'top': 380.3776041000001}
+
+
+
+
+
+
 
 
 
