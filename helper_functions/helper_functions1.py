@@ -144,6 +144,7 @@ Output
 
 time_spent dictionary, columns of time_diff and region
 '''
+
 def y_maze_regions(behavioral_df, maze_type):
     mouse_df = behavioral_df.copy()
     mouse_df['time_diff'] = mouse_df['#Snapshot Timestamp'].diff()
@@ -192,7 +193,6 @@ Gets total distance traveled for experiment
 
 """
 
-
 def total_distance(behavioral_df):
     mouse_df = behavioral_df.copy()
     dx = (mouse_df['Position.X'] - mouse_df['Position.X'].shift())
@@ -219,21 +219,13 @@ Outputs a dataframe with the comprehensive data from the statistical functions i
 Also outputs a second dataframe with descriptive stats gives region times and speed/velocity 
 '''
 
-def build_metadata(df_path):
-    mouse_df = pd.read_csv(df_path, header=2, sep='\t')
-    settings = pd.read_csv(df_path, nrows=2, header=None, sep='\t')  #pd.read_csv(df_path).iloc[0, 0]
-
-
-
 def mouse_farm(df_path, maze_array, dist_threshold=.1):
-
 
     mouse_df = pd.read_csv(df_path, header=2, sep='\t')
     settings = pd.read_csv(df_path, nrows=2, header=None, sep='\t')
     vrsettings = settings.iloc[0][0]
     mazesettings = settings.iloc[1][0]
-
-
+    filename = os.path.basename(df_path)
 
     def drug_applied(path):
         if 'saline' in path:
@@ -250,7 +242,8 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
     region_times = ymaze_data[1]
     total_distance_traveled = total_distance(mouse_df[['Position.X', 'Position.Y']])
 
-    mouse_df['full_path'] = df_path
+    mouse_df['filename'] = filename
+    mouse_df['file_path'] = df_path
     mouse_df['maze_type'] = maze_array
     mouse_df['.vrsettings'] = vrsettings
     mouse_df['.mazesettings'] = mazesettings
@@ -262,10 +255,17 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
     mouse_df['right_time'] = region_times['right']
 
     final_df = pd.concat([mouse_df, wall_distance, speed, ymaze_data[0]], axis=1)
+    # Columns of final df:['#Snapshot Timestamp', 'Trigger Region Identifier', 'Position.X',
+    #        'Position.Y', 'Position.Z', 'Forward.X', 'Forward.Y', 'Forward.Z',
+    #        'filename', 'file_path', 'maze_type', '.vrsettings', '.mazesettings',
+    #        'drug_applied', 'total_distance', 'top_time', 'center_time',
+    #        'left_time', 'right_time', 'dist_wall_units', 'distance_marked',
+    #        'Speed', 'time_diff', 'region']
 
+# JSON file of single-line metadata
 
-
-    metadata_json = {'filename': df_path,
+    metadata_json = {'file_name': filename,
+                     'file_path': df_path,
                      'maze': maze_array,
                      '.vrsetting': vrsettings,
                      '.maze': mazesettings,
@@ -273,11 +273,9 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
                      'distance_traveled': total_distance_traveled
                      }
 
-
     metadata_json = {**metadata_json, **region_times}
 
     return final_df, metadata_json
-
 
 
 def generate_analyis(behavioral_filepath, maze_array, dist_threshold=.1, output_path=None):
@@ -304,15 +302,7 @@ def main():
 
 
     path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__1.behavior'
-    print(mouse_farm(path, 'ymaze'))
-
-
-
-
-
-
-
-
+    print(mouse_farm(path, 'ymaze')[0].columns)
 
 
 
