@@ -8,23 +8,7 @@ import os
 
 # ------------ First line functions ----------------------- #
 """
-Creates rug applied column data
-
-"""
-def drug_applied(path):
-    if 'saline' in path:
-        return 'saline'
-    elif 'cocaine' in path:
-        return 'cocaine'
-    else:
-        return None
-
-
-
-"""
 Creates pairing_info column data
-
-
 """
 
 
@@ -35,69 +19,6 @@ def pairing_info(path):
         return 'cocaine'
     else:
         return None
-
-
-def shape_shrink(maze_polygon, distance_threshold):
-    distance_val = 1 - distance_threshold
-    if isinstance(maze_polygon, int):
-        p = Point(0, 0)
-        inner_circle = maze_polygon * distance_val
-        polygon_maze = p.buffer(maze_polygon)
-        reduced_poly = polygon_maze.difference(Point(0.0, 0.0).buffer(inner_circle))  # <- donut
-
-    else:
-        ident_mat = np.zeros((2, 2), float)
-        np.fill_diagonal(ident_mat, distance_val)
-        coords_t = maze_polygon.transpose()
-        coords_red = np.matmul(ident_mat, coords_t)
-        polygon_maze = Polygon(maze_polygon)
-        red_lin = LinearRing(coords_red.transpose())
-        reduced_poly = Polygon(maze_polygon, [red_lin])
-
-    return polygon_maze, reduced_poly
-
-
-
-'''
-Checks that coordinates are in entire maze. 
-'''
-
-
-def within_bounds(df, polygon):
-    df['in_poly'] = df.apply(lambda row: polygon.contains(Point(row["Position.X"], row["Position.Y"])), axis=1)
-    if (~df['in_poly']).sum() != 0:
-        raise Exception('Warning! Mouse movement detected outside of Polygon boundaries.')
-
-
-# ----------- Functions for use in y_maze_time_spent() ------------ #
-
-def region_match(row):
-    if row['top']:
-        return 'top'
-    elif row['center']:
-        return 'center'
-    elif row['right']:
-        return 'right'
-    elif row['left']:
-        return 'left'
-    else:
-        raise Exception('Warning! Mouse coordinates found outside of all ymaze regions.')
-
-
-
-'''
-Organizes the coordinates for each ymaze region in a dictionary with region name as keys and coordinates as values
-'''
-
-def regions_dictionary():
-    top = Polygon(LineString([(-125, 513.924), (-125, 13.925), (125, 13.925), (125, 513.924), (-125, 513.924)]))
-    center = Polygon(LineString([(0, -202.582), (-125, 13.925), (125, 13.925), (0, -202.582)]))
-    left = Polygon(LineString([(-125, 13.925), (-558.013, -236.075), (-433.013, -452.582), (0, -202.582), (-125, 13.925)]))
-    right = Polygon(LineString([(125, 13.925), (558.013, -236.075), (433.013, -452.582), (0, -202.582), (125, 13.925)]))
-
-    return {'top': top, 'center': center, 'left': left, 'right': right}
-
-
 
 '''
 Organizes maze coordinates for function use. 
@@ -167,6 +88,31 @@ Dataframe of two columns:
 '''
 
 def mouse_edge_distance(behavioral_df, maze_name, distance_threshold):
+
+    def shape_shrink(maze_polygon, distance_threshold):
+        distance_val = 1 - distance_threshold
+        if isinstance(maze_polygon, int):
+            p = Point(0, 0)
+            inner_circle = maze_polygon * distance_val
+            polygon_maze = p.buffer(maze_polygon)
+            reduced_poly = polygon_maze.difference(Point(0.0, 0.0).buffer(inner_circle))  # <- donut
+
+        else:
+            ident_mat = np.zeros((2, 2), float)
+            np.fill_diagonal(ident_mat, distance_val)
+            coords_t = maze_polygon.transpose()
+            coords_red = np.matmul(ident_mat, coords_t)
+            polygon_maze = Polygon(maze_polygon)
+            red_lin = LinearRing(coords_red.transpose())
+            reduced_poly = Polygon(maze_polygon, [red_lin])
+
+        return polygon_maze, reduced_poly
+
+    def within_bounds(df, polygon):
+        df['in_poly'] = df.apply(lambda row: polygon.contains(Point(row["Position.X"], row["Position.Y"])), axis=1)
+        if (~df['in_poly']).sum() != 0:
+            raise Exception('Warning! Mouse movement detected outside of Polygon boundaries.')
+
     df_test = behavioral_df.copy()
     shape = shapes(maze_name)
 
@@ -227,67 +173,18 @@ def y_maze_regions(behavioral_df, maze_type):
 
     if maze_type == 'ymaze':
         region_times = {}
-        mouse_df['regions'] = mouse_df.apply(isin_region, axis=1)
-        regions_grouped = mouse_df.groupby(['regions'])
+        mouse_df['region'] = mouse_df.apply(isin_region, axis=1)
+        regions_grouped = mouse_df.groupby(['region'])
         for region, df in regions_grouped:
             region_times[region] = df['time_diff'].sum()
 
     else:
-        mouse_df['regions'] = None
+        mouse_df['region'] = None
         region_times = {'top': None, 'center': None, 'left': None, 'right': None}
 
-    return mouse_df[['time_diff', 'regions']], region_times
+    return mouse_df[['time_diff', 'region']], region_times
 
 
-
-
-
-
-
-def y_maze_time_spent(behavioral_df, file_name, maze_type):
-    ymaze_mouse = behavioral_df.copy()
-    ymaze_mouse['time_diff'] = ymaze_mouse['#Snapshot Timestamp'].diff()
-    if maze_type == 'ymaze':
-        time_spent_region = {}
-
-    # Labels the different regions in a dictionary
-        regions_coordinates = regions_dictionary()
-
-    # Uses the key value pairs of regions_dict to label which region each coordinate resides
-    # Lastly sums up the time spent in each region as a second dictionary
-
-        for key, value in regions_coordinates.items():
-
-            ymaze_mouse[key] = ymaze_mouse.apply(lambda row: value.contains(Point(row["Position.X"], row["Position.Y"])),axis=1)
-            time_spent_region[key] = ymaze_mouse[ymaze_mouse[key] == True]['time_diff'].sum()
-
-    # Applies the region_match function to each row and gives a string label for where the coordinate was found
-        ymaze_mouse['region'] = ymaze_mouse.apply(region_match, axis=1)
-        first_time = ymaze_mouse['#Snapshot Timestamp'][0]
-        first_region = ymaze_mouse['region'][0]
-        time_spent_region[first_region] += first_time
-
-    # Set new key names to output dictionary
-        new_names = {'center': 'center_time', 'left': 'left_time', 'right': 'right_time', 'top': 'top_time'}
-        time_spent_region = dict((new_names[key], value) for (key, value) in time_spent_region.items())
-
-        extra_vals = {'filepath': file_name, 'maze_type': maze_type}
-        time_spent_region.update(extra_vals)
-
-    else:
-        time_spent_region = {
-                'filepath': file_name,
-                'top_time': None,
-                'center_time': None,
-                'left_time': None,
-                'right_time': None,
-                'maze_type': maze_type
-                }
-        ymaze_mouse['region'] = np.nan
-
-    des_df = pd.DataFrame(time_spent_region, columns=['filepath','top_time','center_time','left_time','right_time'], index=[0])
-
-    return des_df, ymaze_mouse[['time_diff', 'region']], time_spent_region
 
 
 """
@@ -322,31 +219,64 @@ Outputs a dataframe with the comprehensive data from the statistical functions i
 Also outputs a second dataframe with descriptive stats gives region times and speed/velocity 
 '''
 
-def mouse_farm(df_path, maze_array, dist_threshold=.1):
+def build_metadata(df_path):
     mouse_df = pd.read_csv(df_path, header=2, sep='\t')
-    # file_path = pd.read_csv(df_path).iloc[0, 0]
-    file_name = df_path
+    settings = pd.read_csv(df_path, nrows=2, header=None, sep='\t')  #pd.read_csv(df_path).iloc[0, 0]
 
-    mouse_df['filepath'] = df_path
-    mouse_df['maze_type'] = maze_array
 
-    mouse_distance = mouse_edge_distance(mouse_df, maze_array, dist_threshold)
-    mouse_df['speed'] = helper_functions2.calc_speed(mouse_df)
 
-    mouse_df['drug_applied'] = mouse_df.apply(lambda row: drug_applied(row['filepath']), axis=1)
-    # mouse_df['pairing_info'] = mouse_df.apply(lambda row: helper_functions1.pairing_info(row['filepath']), axis=1)
+def mouse_farm(df_path, maze_array, dist_threshold=.1):
 
-    time_spent = y_maze_time_spent(mouse_df, file_name, maze_array)
+
+    mouse_df = pd.read_csv(df_path, header=2, sep='\t')
+    settings = pd.read_csv(df_path, nrows=2, header=None, sep='\t')
+    vrsettings = settings.iloc[0][0]
+    mazesettings = settings.iloc[1][0]
+
+
+
+    def drug_applied(path):
+        if 'saline' in path:
+            return 'saline'
+        elif 'cocaine' in path:
+            return 'cocaine'
+        else:
+            return None
+
+    drug = drug_applied(df_path)
+    wall_distance = mouse_edge_distance(mouse_df, maze_array, dist_threshold)
+    speed = helper_functions2.calc_speed(mouse_df)
+    ymaze_data = y_maze_regions(mouse_df, maze_array)
+    region_times = ymaze_data[1]
     total_distance_traveled = total_distance(mouse_df[['Position.X', 'Position.Y']])
 
-    final_df = pd.concat([mouse_df, mouse_distance, time_spent[1]], axis=1)
-    des_df_row = pd.concat([time_spent[0], helper_functions2.avg_velocity(mouse_df), total_distance_traveled], axis=1)
+    mouse_df['full_path'] = df_path
+    mouse_df['maze_type'] = maze_array
+    mouse_df['.vrsettings'] = vrsettings
+    mouse_df['.mazesettings'] = mazesettings
+    mouse_df['drug_applied'] = drug
+    mouse_df['total_distance'] = total_distance_traveled
+    mouse_df['top_time'] = region_times['top']
+    mouse_df['center_time'] = region_times['center']
+    mouse_df['left_time'] = region_times['left']
+    mouse_df['right_time'] = region_times['right']
 
-    des_df_row.insert(5, 'drug_applied', drug_applied(df_path))
-    des_df_row.insert(5, 'maze_type', maze_array)
+    final_df = pd.concat([mouse_df, wall_distance, speed, ymaze_data[0]], axis=1)
 
-    # mesg = 'File Processed.'
-    return final_df, des_df_row
+
+
+    metadata_json = {'filename': df_path,
+                     'maze': maze_array,
+                     '.vrsetting': vrsettings,
+                     '.maze': mazesettings,
+                     'drug_applied': drug,
+                     'distance_traveled': total_distance_traveled
+                     }
+
+
+    metadata_json = {**metadata_json, **region_times}
+
+    return final_df, metadata_json
 
 
 
@@ -374,10 +304,9 @@ def main():
 
 
     path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__1.behavior'
-    df = pd.read_csv(path, header=2, sep='\t')
-    test1 = y_maze_time_spent(df, path, maze_type='ymaze')
-    print(test1)
-    # {'center': 1.9873099999999013, 'left': 509.18416, 'right': 8.456999999999994, 'top': 380.3776041000001}
+    print(mouse_farm(path, 'ymaze'))
+
+
 
 
 
