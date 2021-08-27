@@ -34,7 +34,7 @@ def shapes(maze_array, plotly=False):
     elif maze_array.lower() == 'circle':
         coords = 750  # <- radius
 
-    elif maze_array.lower() == 'ymaze':
+    elif maze_array == 'Y_Maze':
             coords = np.array([[-433.013, -452.582],
                                [0, -202.582],
                                [433.013, -452.582],
@@ -51,11 +51,17 @@ def shapes(maze_array, plotly=False):
                 y = np.append(y, [-452.582])
                 return x, y
 
-    elif maze_array.lower() == 'corridor':
+    elif maze_array == 'Corridor':
         coords = np.array([[-75, -1332.286],
                            [-75, 1332.286],
                            [75, 1332.286],
                            [75, -1332.286]])
+
+        if plotly:
+            x, y = coords.T
+            x = np.append(x, -75)
+            y = np.append(y, -1332.286)
+            return x, y
 
     else:
         return print('Give a valid shape type.')
@@ -170,9 +176,9 @@ def y_maze_regions(behavioral_df, maze_type):
             return 'right'
 
         else:
-            raise Exception(f'Points on {row["#Snapshot Timestamp"]} not found in any region for ymaze.')
+            raise Exception(f'Points on {row["#Snapshot Timestamp"]} not found in any region for Y_Maze.')
 
-    if maze_type == 'ymaze':
+    if maze_type == 'Y_Maze':
         region_times = {}
         mouse_df['region'] = mouse_df.apply(isin_region, axis=1)
         regions_grouped = mouse_df.groupby(['region'])
@@ -219,12 +225,16 @@ Outputs a dataframe with the comprehensive data from the statistical functions i
 Also outputs a second dataframe with descriptive stats gives region times and speed/velocity 
 '''
 
-def mouse_farm(df_path, maze_array, dist_threshold=.1):
+def mouse_farm(df_path, dist_threshold=.1):
 
     mouse_df = pd.read_csv(df_path, header=2, sep='\t')
     settings = pd.read_csv(df_path, nrows=2, header=None, sep='\t')
     vrsettings = settings.iloc[0][0]
     mazesettings = settings.iloc[1][0]
+
+    maze_types = ['Corridor', 'Y_Maze']
+    maze_array = [maze for maze in maze_types if maze in mazesettings][0]
+
     filename = os.path.basename(df_path)
 
     def drug_applied(path):
@@ -266,7 +276,7 @@ def mouse_farm(df_path, maze_array, dist_threshold=.1):
 
     metadata_json = {'file_name': filename,
                      'file_path': df_path,
-                     'maze': maze_array,
+                     'maze_type': maze_array,
                      '.vrsetting': vrsettings,
                      '.maze': mazesettings,
                      'drug_applied': drug,
@@ -301,8 +311,10 @@ def generate_analyis(behavioral_filepath, maze_array, dist_threshold=.1, output_
 def main():
 
 
-    path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8002_CPP_y_maze__1.behavior'
-    print(mouse_farm(path, 'ymaze')[0].columns)
+    path = r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/8010_CPP_y_maze__2.behavior'
+    print(mouse_farm(path)[0].to_csv(r'/Users/colinmason/Desktop/yorglab/rat_maze_sim/CPP Experiment Data/Final Test Day/test_class.csv'))
+
+
 
 
 
